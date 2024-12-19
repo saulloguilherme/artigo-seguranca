@@ -1,4 +1,5 @@
 from traceback import print_tb
+from typing import Any
 
 import pandas as pd
 from requests import Response
@@ -31,7 +32,7 @@ def get_row(url: str) -> pd.DataFrame:
                                   "activate_days", "page_rank", "certificate",
                                   "redirect", "https_text", "caract_hifen",
                                   "iframe"],
-                        data=[atributos], )
+                        data=[atributos])
 
 
 # Receber o objeto de resposta da página
@@ -64,9 +65,12 @@ def has_arroba(url : str) -> bool:
     return "@" in url
 
 # A6 - Total de dias ativo
-def active_days(response : Response) -> int:
+def active_days(response : Response) -> Any | None:
     json = response.json()
-    return json.get("result").get("validity_days") - json.get("result").get("days_left")
+    try:
+        return json.get("result").get("validity_days") - json.get("result").get("days_left")
+    except:
+        return None
 
 # A7 - PageRank
 def pagerank_pontos(url: str) -> float:
@@ -89,8 +93,10 @@ def has_form(page : Response) -> bool:
 
 # A9 - Validade do Certificado SSL
 def validade_ssl(response : Response) -> bool:
-    return response.json().get("result").get("cert_valid")
-
+    try:
+        return response.json().get("result").get("cert_valid")
+    except:
+        return None
 # A10 - Contem caracteres ’//’ Quando usado, exceto em ’https://’ ou ’http://’
 def has_barra(host : str) -> bool:
     return "//" in host
